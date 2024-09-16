@@ -16,11 +16,13 @@ namespace InfinionBackend.Infrastructure.Services
         private readonly SignInManager<User> _signInManager;
         private readonly UserManager<User> _userManager;
         private readonly ITokenService _tokenService;
-        public UserService(UserManager<User> userManager, SignInManager<User> signInManager, ITokenService tokenService)
+        private readonly IEmailService _emailService;
+        public UserService(UserManager<User> userManager, SignInManager<User> signInManager, ITokenService tokenService, IEmailService emailService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _tokenService = tokenService;
+            _emailService = emailService;
         }
 
 
@@ -52,7 +54,8 @@ namespace InfinionBackend.Infrastructure.Services
 
 
             //Send Email to User
-
+            var body = "Congratulations! Your account has been created successfully";
+            await _emailService.SendEmail(userSignupDTO.Email, body);
 
             return true;
         }

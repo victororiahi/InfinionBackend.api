@@ -11,15 +11,12 @@ namespace InfinionBackend.Api.Controllers
     [ApiController]
     public class AccountController : ControllerBase
     {
-        
-            private readonly IUserService _userService;
-            private readonly ITokenService _tokenService;
-            private readonly AppDbContext _context;
-            public AccountController(IUserService userService, ITokenService tokenService)
-            {
-                _userService = userService;
-                _tokenService = tokenService;
-            }
+
+        private readonly IUserService _userService;
+        public AccountController(IUserService userService)
+        {
+            _userService = userService;
+        }
 
         public IUserService Get_userService()
         {
@@ -28,55 +25,47 @@ namespace InfinionBackend.Api.Controllers
 
 
         [HttpPost("Register")]
-            public async Task<IActionResult> Register([Required][FromBody] UserSignupDTO userSignupDTO, IUserService _userService)
+        public async Task<IActionResult> Register([Required][FromBody] UserSignupDTO userSignupDTO)
+        {
+            try
             {
-                try
+                var result = await _userService.CreateUser(userSignupDTO);
+                if (result) return Ok("User created successfully!");
+
+                throw new Exception("User creation failed.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Oooops! Something went wrong!");
+            }
+        }
+
+
+        [HttpPost("Login")]
+        public async Task<IActionResult> Login([Required][FromBody] UserLoginDTO userLoginDTO)
+        {
+            try
+            {
+
+                if (!ModelState.IsValid)
                 {
-                    var result = await _userService.CreateUser(userSignupDTO);
-                    return result;
+                    return BadRequest();
                 }
-                catch (Exception ex)
-                {
-                    return StatusCode(StatusCodes.Status500InternalServerError, "Oooops! Something went wrong!");
-                }
+
+                //Check if user exists with the provided Email and Password
+                var res = await _userService.Login(userLoginDTO);
+
+
+                
+                //Return token in the response
+                return Ok(res);
             }
 
-
-            [HttpPost("Login")]
-            public async Task<IActionResult> Login([Required][FromBody] UserLoginDTO userLoginDTO)
+            catch (Exception ex)
             {
-                try
-                {
-
-                    if (!ModelState.IsValid)
-                    {
-                        return BadRequest();
-                    }
-
-                    //Check if user exists with the provided Email and Password
-                    var user = await _userService.Login(userLoginDTO);
-
-
-                    //If user credentials are not authentic, return Bad Request with a message
-                    if (user == null)
-                    {
-                        return this.Problem("Username or password is incorrect", statusCode: 400);
-                    }
-
-
-                    //Generate Jwt token
-                    var token = _tokenService.GenerateToken(user, roles);
-
-                    //Return token in the response
-                    return Ok(new { Token = token });
-                }
-
-                catch (Exception ex)
-                {
-                    return StatusCode(StatusCodes.Status500InternalServerError, "Oooops! Something went wrong!");
-                }
+                return StatusCode(StatusCodes.Status500InternalServerError, "Oooops! Something went wrong!");
             }
         }
     }
-
 }
+

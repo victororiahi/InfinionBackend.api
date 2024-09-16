@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using InfinionBackend.Data;
 using InfinionBackend.Data.Entities;
+using InfinionBackend.Infrastructure.DTOs;
 using InfinionBackend.Infrastructure.Interface.Repository;
 using InfinionBackend.Infrastructure.Utitlities;
 using Microsoft.EntityFrameworkCore;
@@ -20,17 +21,22 @@ namespace InfinionBackend.Infrastructure.Repository
             _dbContext = dbContext;
         }
 
-        public async Task<Product> AddProduct(Product product)
+        public async Task<Product> AddProduct(ProductDTO product)
         {
             var entity = await _dbContext.Set<Product>().FirstOrDefaultAsync(x => x.Name == product.Name);
             if (entity != null) 
                 throw new Exception($"Product: {product.Name} already exists!");
-            
-            product.DateAdded = DateTime.Now;
+            var ent = new Product
+            {
+                DateAdded = DateTime.Now,
+                Name = product.Name,
+                Description = product.Description,
+                Price = product.Price
+            };
 
-            await _dbContext.AddAsync(product);
+            await _dbContext.AddAsync(ent);
             await _dbContext.SaveChangesAsync();
-            return product;
+            return ent;
         }
 
         public async Task<bool> DeleteProduct(int id)
@@ -76,9 +82,9 @@ namespace InfinionBackend.Infrastructure.Repository
             return product;
         }
 
-        public async Task<Product> UpdateProduct(Product product)
+        public async Task<Product> UpdateProduct(int id,ProductDTO product)
         {
-            var entity = await _dbContext.Set<Product>().FirstOrDefaultAsync(x => x.Id == product.Id);
+            var entity = await _dbContext.Set<Product>().FirstOrDefaultAsync(x => x.Id == id);
             if (entity == null) throw new Exception("Product not found");
 
             entity.Name = product.Name ?? entity.Name;
