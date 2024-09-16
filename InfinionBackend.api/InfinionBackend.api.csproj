@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\InfinionBackend.app\InfinionBackend.Infrastructure.csproj" />
+    <ProjectReference Include="..\InfinionBackend.dom\InfinionBackend.Data.csproj" />
   </ItemGroup>
 
 </Project>

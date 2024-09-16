@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using InfinionBackend.Data;
 using InfinionBackend.Infrastructure.DTOs;
-using InfinionBackend.Infrastructure.Services;
+using InfinionBackend.Infrastructure.Interface.Service;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,12 +9,13 @@ namespace InfinionBackend.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class UserController : ControllerBase
+    public class AccountController : ControllerBase
     {
         
             private readonly IUserService _userService;
             private readonly ITokenService _tokenService;
-            public UserController(IUserService userService, ITokenService tokenService)
+            private readonly AppDbContext _context;
+            public AccountController(IUserService userService, ITokenService tokenService)
             {
                 _userService = userService;
                 _tokenService = tokenService;
