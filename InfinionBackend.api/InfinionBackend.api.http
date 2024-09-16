@@ -1,0 +1,6 @@
+@InfinionBackend.api_HostAddress = http://localhost:5094
+
+GET {{InfinionBackend.api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
