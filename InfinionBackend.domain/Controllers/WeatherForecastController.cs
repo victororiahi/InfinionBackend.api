@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 
-namespace InfinionBackend.api.Controllers
+namespace InfinionBackend.domain.Controllers
 {
     [ApiController]
     [Route("[controller]")]

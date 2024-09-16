@@ -1,4 +1,4 @@
-namespace InfinionBackend.api
+namespace InfinionBackend.domain
 {
     public class WeatherForecast
     {
