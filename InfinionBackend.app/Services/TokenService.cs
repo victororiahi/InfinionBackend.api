@@ -12,7 +12,7 @@ using InfinionBackend.Infrastructure.Interface.Service;
 
 namespace InfinionBackend.Infrastructure.Services
 {
-    internal class TokenService : ITokenService
+    public class TokenService : ITokenService
 
     {
         private readonly IConfiguration _configuration;
@@ -22,7 +22,7 @@ namespace InfinionBackend.Infrastructure.Services
             _configuration = configuration;
         }
 
-        public string GenerateToken(User user, List<string> roles)
+        public string GenerateToken(User user)
         {
             //Create list of claims
             var claims = new List<Claim>
@@ -30,16 +30,11 @@ namespace InfinionBackend.Infrastructure.Services
                 new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
                 new Claim(JwtRegisteredClaimNames.Email, user.Email),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new Claim("PhoneNumber",user.PhoneNumber),
                 new Claim("FirstName",user.FirstName),
                 new Claim("LastName",user.LastName)
             };
 
-            foreach (var role in roles)
-            {
-                claims.Add(new Claim(ClaimTypes.Role, role));
-            }
-
+           
             //Prepare token expiration
             var expiration = DateTime.Now.AddMinutes(
                 Convert.ToInt32(_configuration["Authentication:JwtBearer:AccessExpiration"]

@@ -5,10 +5,11 @@ using System.Text;
 using System.Threading.Tasks;
 using InfinionBackend.Data.Entities;
 
-namespace InfinionBackend.Infrastructure.Interface.Service
+namespace InfinionBackend.Infrastructure.DTOs
 {
-    public interface ITokenService
+    public class LoginResponseDTO
     {
-        string GenerateToken(User user);
+        public  User User { get; set; }
+        public  string Token { get; set; }
     }
 }

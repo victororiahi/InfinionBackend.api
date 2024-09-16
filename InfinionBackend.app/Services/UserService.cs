@@ -7,114 +7,99 @@ using System.Threading.Tasks;
 using InfinionBackend.Data.Entities;
 using InfinionBackend.Infrastructure.DTOs;
 using InfinionBackend.Infrastructure.Interface.Service;
+using Microsoft.AspNetCore.Identity;
 
 namespace InfinionBackend.Infrastructure.Services
 {
     public class UserService : IUserService
+    {
+        private readonly SignInManager<User> _signInManager;
+        private readonly UserManager<User> _userManager;
+        private readonly ITokenService _tokenService;
+        public UserService(UserManager<User> userManager, SignInManager<User> signInManager, ITokenService tokenService)
         {
-            private readonly SignInManager<User> _signInManager;
-            private readonly RoleManager<Role> _roleManager;
-            private readonly UserManager<User> _userManager;
-            public UserService(UserManager<User> userManager, RoleManager<Role> roleManager, SignInManager<User> signInManager)
+            _userManager = userManager;
+            _signInManager = signInManager;
+            _tokenService = tokenService;
+        }
+
+
+        public async Task<bool> CreateUser(UserSignupDTO userSignupDTO)
+        {
+            //Check if the user exists
+            var user = await _userManager.FindByEmailAsync(userSignupDTO.Email);
+            if (user == null)
             {
-                _userManager = userManager;
-                _roleManager = roleManager;
-                _signInManager = signInManager;
+                throw new Exception($"User : {userSignupDTO.Email} already exists!");
+            }
+
+            //Create the object of user entity
+            var newUser = new User
+            {
+                FirstName = userSignupDTO.FirstName,
+                LastName = userSignupDTO.LastName,
+                Email = userSignupDTO.Email
+
+            };
+
+
+            //Add object from user to users table
+            var result = await _userManager.CreateAsync(user, userSignupDTO.Password);
+            if (!result.Succeeded)
+            {
+                throw new Exception($"Something went wrong. Failed to create the user : {result.Errors.FirstOrDefault()}");
             }
 
 
-            public async Task<ObjectResult> CreateUser(UserSignupDTO userSignupDTO)
+            //Send Email to User
+
+
+            return true;
+        }
+
+        //Login
+        public async Task<LoginResponseDTO> Login(UserLoginDTO userLoginDTO)
+        {
+            try
             {
-                //Check if role to be assigned the user exists
-                var roleFound = await _roleManager.FindByNameAsync(userSignupDTO.UserRole);
-                if (roleFound == null)
+                //Check if user exists
+                var user = await _userManager.FindByEmailAsync(userLoginDTO.Email);
+                if (user == null)
                 {
-                    return new BadRequestObjectResult($"The {userSignupDTO.UserRole} you have entered does not exist");
+                    throw new Exception("Invalid username or password");
                 }
 
-                //Create the object of user entity
-                var user = new User
+
+                //Check if password is correct
+                var result = _userManager.PasswordHasher.VerifyHashedPassword(user, user.PasswordHash, userLoginDTO.Password);
+                if (result == PasswordVerificationResult.Failed)
                 {
-                    FirstName = userSignupDTO.FirstName,
-                    LastName = userSignupDTO.LastName,
-                    PhoneNumber = userSignupDTO.PhoneNumber,
-                    Email = userSignupDTO.Email,
-                    NormalizedEmail = userSignupDTO.Email.ToUpper(),
-                    NormalizedUserName = userSignupDTO.Email.ToUpper(),
-                    UserName = userSignupDTO.Email,
-                    EmailConfirmed = true
+                    throw new Exception("Invalid username or password");
+                }
+
+
+                await _signInManager.PasswordSignInAsync(user.Email, userLoginDTO.Password, false, false);
+
+
+                //get token
+                var token = _tokenService.GenerateToken(user);
+
+
+                return new LoginResponseDTO
+                {
+                    User = user,
+                    Token = token
                 };
-
-                //Add object from user to users table
-                var result = await _userManager.CreateAsync(user, userSignupDTO.Password);
-                if (!result.Succeeded)
-                {
-                    return new UnprocessableEntityObjectResult("Something went wrong. Failed to create the user");
-                }
-
-                //Assign the user a role
-                var userRoleResult = await _userManager.AddToRoleAsync(user, userSignupDTO.UserRole);
-                if (!userRoleResult.Succeeded)
-                {
-                    return new UnprocessableEntityObjectResult("Could not assign the user a role");
-                }
-
-                return new OkObjectResult("User has been created successfully");
-
-
             }
-
-            //Login
-            public async Task<User> Login(UserLoginDTO userLoginDTO)
+            catch (Exception)
             {
-                try
-                {
-                    //Check if user exists
-                    var user = await _userManager.FindByEmailAsync(userLoginDTO.Email);
-                    if (user == null)
-                    {
-                        return null;
-                    }
 
-                    //Check if password is correct
-                    var result = _userManager.PasswordHasher.VerifyHashedPassword(user, user.PasswordHash, userLoginDTO.Password);
-                    if (result == PasswordVerificationResult.Failed)
-                    {
-                        return null;
-                    }
-
-                    await _signInManager.PasswordSignInAsync(user.Email, userLoginDTO.Password, false, false);
-                    return user;
-                }
-                catch (Exception)
-                {
-
-                    throw;
-                }
-            }
-
-            //Get Roles
-            public async Task<List<string>> GetRolesForUser(User user)
-            {
-                var roles = await _userManager.GetRolesAsync(user);
-                return roles.ToList();
-            }
-
-            public async Task<List<User>> GetUsers()
-            {
-                try
-                {
-                    var users = await _userManager.Users.ToListAsync();
-                    return users;
-                }
-                catch (Exception)
-                {
-
-                    throw;
-                }
+                throw;
             }
         }
-    }
 
+        
+    }
 }
-}
+
+

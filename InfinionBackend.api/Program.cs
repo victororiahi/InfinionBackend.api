@@ -43,10 +43,10 @@ builder.Services.AddSwaggerGen(c =>
 builder.Services.AddDbContext<AuthExampleDbContext>(o => o.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
 
 builder.Services.AddIdentity<User, Role>(opt => {
-    opt.Password.RequireNonAlphanumeric = false;
-    opt.Password.RequireDigit = false;
-    opt.Password.RequireLowercase = false;
-    opt.Password.RequireUppercase = false;
+    opt.Password.RequireNonAlphanumeric = true;
+    opt.Password.RequireDigit = true;
+    opt.Password.RequireLowercase = true;
+    opt.Password.RequireUppercase = true;
     opt.User.RequireUniqueEmail = true;
 })
     .AddEntityFrameworkStores<AuthExampleDbContext>()
