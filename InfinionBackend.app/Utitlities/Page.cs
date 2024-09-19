@@ -22,24 +22,5 @@ namespace InfinionBackend.Infrastructure.Utitlities
             Items = items;
         }
     }
-    public class PagedEnumerable<T> : PageInfo
-    {
-        public IEnumerable<T> Data { get; set; }
-
-        public PagedEnumerable(IEnumerable<T> items, int totalSize, int pageNumber, int pageSize)
-        {
-            if (pageNumber < 1) pageNumber = 1;
-            Size = totalSize;
-            PageNumber = pageNumber;
-            PageSize = pageSize;
-            Data = items;
-        }
-    }
-
-    public class PageInfo
-    {
-        public int PageNumber { get; set; }
-        public int PageSize { get; set; }
-        public int Size { get; set; }
-    }
+    
 }

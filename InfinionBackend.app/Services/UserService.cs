@@ -50,7 +50,7 @@ namespace InfinionBackend.Infrastructure.Services
             var result = await _userManager.CreateAsync(newUser, userSignupDTO.Password);
             if (!result.Succeeded)
             {
-                throw new Exception($"Something went wrong. Failed to create the user : {result.Errors.FirstOrDefault()}");
+                throw new Exception($"Something went wrong. Failed to create the user : {result.Errors.FirstOrDefault()?.Description}");
             }
 
 

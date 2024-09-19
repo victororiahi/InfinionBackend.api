@@ -1,5 +1,6 @@
 using System.Data;
 using System.Text;
+using System.Text.Json.Serialization;
 using InfinionBackend.Data;
 using InfinionBackend.Data.Entities;
 using InfinionBackend.Infrastructure.Interface.Repository;
@@ -14,9 +15,12 @@ using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Add services to the container
 
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddJsonOptions(option =>
+{
+    option.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+});
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>

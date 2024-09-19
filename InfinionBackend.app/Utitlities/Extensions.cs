@@ -9,14 +9,6 @@ namespace InfinionBackend.Infrastructure.Utitlities
 {
     public static class Extensions
     {
-        public static Page<T> ToPageList<T>(this IEnumerable<T> query, int pageNumber, int pageSize)
-        {
-            var count = query.Count();
-            int offset = (pageNumber - 1) * pageSize;
-            var items = query.Skip(offset).Take(pageSize).ToArray();
-            return new Page<T>(items, count, pageNumber, pageSize);
-        }
-
         public static async Task<Page<T>> ToPageListAsync<T>(this IQueryable<T> query, int pageNumber, int pageSize)
         {
             var count = await query.CountAsync();
