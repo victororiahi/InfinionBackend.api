@@ -13,14 +13,13 @@ namespace InfinionBackend.Infrastructure.Services
 {
     public class UserService : IUserService
     {
-        private readonly SignInManager<User> _signInManager;
+        
         private readonly UserManager<User> _userManager;
         private readonly ITokenService _tokenService;
         private readonly IEmailService _emailService;
-        public UserService(UserManager<User> userManager, SignInManager<User> signInManager, ITokenService tokenService, IEmailService emailService)
+        public UserService(UserManager<User> userManager, ITokenService tokenService, IEmailService emailService)
         {
             _userManager = userManager;
-            _signInManager = signInManager;
             _tokenService = tokenService;
             _emailService = emailService;
         }
@@ -30,7 +29,7 @@ namespace InfinionBackend.Infrastructure.Services
         {
             //Check if the user exists
             var user = await _userManager.FindByEmailAsync(userSignupDTO.Email);
-            if (user == null)
+            if (user != null)
             {
                 throw new Exception($"User : {userSignupDTO.Email} already exists!");
             }
@@ -40,13 +39,15 @@ namespace InfinionBackend.Infrastructure.Services
             {
                 FirstName = userSignupDTO.FirstName,
                 LastName = userSignupDTO.LastName,
-                Email = userSignupDTO.Email
+                Email = userSignupDTO.Email,
+                UserName = userSignupDTO.Email,
+                EmailConfirmed = true
 
             };
 
 
             //Add object from user to users table
-            var result = await _userManager.CreateAsync(user, userSignupDTO.Password);
+            var result = await _userManager.CreateAsync(newUser, userSignupDTO.Password);
             if (!result.Succeeded)
             {
                 throw new Exception($"Something went wrong. Failed to create the user : {result.Errors.FirstOrDefault()}");
@@ -81,9 +82,7 @@ namespace InfinionBackend.Infrastructure.Services
                 }
 
 
-                await _signInManager.PasswordSignInAsync(user.Email, userLoginDTO.Password, false, false);
-
-
+                
                 //get token
                 var token = _tokenService.GenerateToken(user);
 

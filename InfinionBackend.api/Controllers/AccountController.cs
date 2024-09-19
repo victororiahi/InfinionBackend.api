@@ -31,7 +31,7 @@ namespace InfinionBackend.Api.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, "Oooops! Something went wrong!");
+                return StatusCode(StatusCodes.Status500InternalServerError, $"Oooops! Something went wrong! {ex.Message}");
             }
         }
 

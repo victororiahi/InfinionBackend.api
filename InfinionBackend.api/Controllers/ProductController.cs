@@ -21,7 +21,7 @@ namespace InfinionBackend.Api.Controllers
         }
 
         [HttpGet("{id}")]
-        public IActionResult GetProduct(int id)
+        public async Task<IActionResult> GetProduct(int id)
         {
             try
             {
@@ -30,7 +30,7 @@ namespace InfinionBackend.Api.Controllers
                     throw new Exception("Invalid Parameter");
                 }
 
-                var res = _productRepository.GetProduct(id);
+                var res = await _productRepository.GetProduct(id);
 
 
 
