@@ -18,11 +18,6 @@ namespace InfinionBackend.Api.Controllers
             _userService = userService;
         }
 
-        public IUserService Get_userService()
-        {
-            return _userService;
-        }
-
 
         [HttpPost("Register")]
         public async Task<IActionResult> Register([Required][FromBody] UserSignupDTO userSignupDTO)

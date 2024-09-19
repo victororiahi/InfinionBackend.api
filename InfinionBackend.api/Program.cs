@@ -47,7 +47,7 @@ builder.Services.AddDbContext<AppDbContext>(o => o.UseSqlServer(builder.Configur
 
 
 
-builder.Services.AddIdentity<User, IdentityRole>(opt => {
+builder.Services.AddIdentity<User, Role>(opt => {
     opt.Password.RequireNonAlphanumeric = true;
     opt.Password.RequiredLength = 8;
     opt.Password.RequireDigit = true;

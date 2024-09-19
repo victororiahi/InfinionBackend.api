@@ -31,7 +31,6 @@ namespace InfinionBackend.Infrastructure.Repository
                 DateAdded = DateTime.Now,
                 Name = product.Name,
                 Description = product.Description,
-                Price = product.Price
             };
 
             await _dbContext.AddAsync(ent);
@@ -63,10 +62,6 @@ namespace InfinionBackend.Infrastructure.Repository
                     records = records.Where(x => EF.Functions.Like(x.Description, $"%{query}%"));
 
                     break;
-                case Filter.Price:
-                    decimal.TryParse(query, out decimal price);
-                    records = records.Where(x => x.Price == price);
-                    break;
                 default:
                     break;
             }
@@ -89,7 +84,6 @@ namespace InfinionBackend.Infrastructure.Repository
 
             entity.Name = product.Name ?? entity.Name;
             entity.Description = product.Description ?? entity.Description;
-            entity.Price = product.Price > 0 ? product.Price : entity.Price;
 
             _dbContext.Update(entity);
             await _dbContext.SaveChangesAsync();

@@ -12,8 +12,7 @@ namespace InfinionBackend.Infrastructure.Utitlities
         {
             None,
             Name,
-            Description,
-            Price
+            Description
         }
     }
 }
